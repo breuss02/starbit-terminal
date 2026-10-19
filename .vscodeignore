@@ -1,0 +1,14 @@
+.vscode/**
+src/**
+tsconfig.json
+**/*.map
+.gitignore
+.npmrc
+node_modules/@anthropic-ai/claude-agent-sdk-*/**
+node_modules/**/*.d.ts
+node_modules/**/*.md
+*.vsix
+Plan-*.md
+Summary-*.md
+docs/**
+.claude/**

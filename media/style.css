@@ -1,0 +1,263 @@
+/* ---------------------------------------------------------------
+   StarBitTerminal — terminal panes + xterm cosmetics.
+   tokens.css (palettes/fonts) and chrome.css (bar/keys/tray) load first.
+   --------------------------------------------------------------- */
+
+.tabview {
+  display: none;
+  height: 100%;
+  gap: 10px;
+}
+.tabview.active { display: flex; }
+
+.pane {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  border-radius: 11px;
+  background: linear-gradient(180deg, var(--paper-top) 0%, var(--paper-bot) 100%);
+  border: 1px solid var(--paper-edge);
+  box-shadow:
+    0 2px 0 var(--paper-hard),
+    0 3px 6px var(--key-shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  padding: 9px 4px 7px 10px;
+  overflow: hidden;
+  transition: box-shadow 120ms ease, border-color 120ms ease,
+    background 200ms ease;
+}
+body[data-theme="dark"] .pane {
+  box-shadow:
+    0 2px 0 var(--paper-hard),
+    0 3px 6px var(--key-shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+.pane.focused {
+  border-color: var(--sel);
+  box-shadow:
+    0 2px 0 var(--paper-hard),
+    0 3px 6px var(--key-shadow),
+    0 0 0 2px var(--sel-soft),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.pane-close {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  z-index: 3;
+  width: 17px;
+  height: 17px;
+  padding: 0;
+  border-radius: 999px;
+  border: 1px solid var(--key-edge);
+  background: var(--x-bg);
+  color: var(--ink-soft);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 100ms ease;
+}
+.pane:hover .pane-close { opacity: 1; }
+.pane-close:hover { color: #e0655c; border-color: #c58a84; }
+.pane-close:focus-visible { outline: 2px solid var(--sel); opacity: 1; }
+
+.term-host {
+  width: 100%;
+  height: 100%;
+}
+
+/* xterm cosmetics */
+.xterm .xterm-viewport {
+  background: transparent !important;
+  scrollbar-width: thin;
+  scrollbar-color: var(--key-hard) transparent;
+}
+.xterm .xterm-viewport::-webkit-scrollbar { width: 8px; }
+.xterm .xterm-viewport::-webkit-scrollbar-thumb {
+  border-radius: 8px;
+  background: var(--key-hard);
+}
+.xterm .xterm-viewport::-webkit-scrollbar-track { background: transparent; }
+
+/* a file being dragged over a pane: light the pane edge in the selection colour */
+.pane.dropping {
+  border-color: var(--sel);
+  box-shadow:
+    0 2px 0 var(--paper-hard),
+    0 3px 6px var(--key-shadow),
+    0 0 0 3px var(--sel-soft),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+/* ---- command bits ---------------------------------------------
+   A short dock after the 8 sockets: smaller sockets holding coloured
+   ✦ keys. Click runs the saved command in the focused pane; the ⋯ dot
+   (or a right-click) opens the editor card; the last socket adds one. */
+
+.bits {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 9px 8px 8px 12px;
+  margin-left: 2px;
+  border-left: 1px solid var(--bar-edge);
+  scrollbar-width: none;
+}
+.bits::-webkit-scrollbar { display: none; }
+
+.bit-socket, .bit-add {
+  width: 32px;
+  height: 30px;
+  border-radius: 10px;
+}
+.socket.empty.bit-add::after {
+  content: "+";
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--key-text);
+  text-shadow: none;
+}
+
+/* one accent per colour name; the swatches in the editor share them */
+.bit, .bit-swatch { --bit: var(--starbit); --bit-glow: rgba(245, 200, 76, 0.6); }
+[data-color="mint"]   { --bit: var(--candy-m); --bit-glow: rgba(62, 201, 143, 0.55); }
+[data-color="blue"]   { --bit: var(--candy-b); --bit-glow: rgba(47, 157, 244, 0.55); }
+[data-color="orange"] { --bit: var(--candy-o); --bit-glow: rgba(247, 148, 29, 0.55); }
+[data-color="red"]    { --bit: #e0655c; --bit-glow: rgba(224, 101, 92, 0.6); }
+[data-color="purple"] { --bit: #a86cc4; --bit-glow: rgba(168, 108, 196, 0.55); }
+[data-color="cyan"]   { --bit: #33b8c9; --bit-glow: rgba(51, 184, 201, 0.55); }
+[data-color="pink"]   { --bit: #ef7fae; --bit-glow: rgba(239, 127, 174, 0.55); }
+
+.bit {
+  width: 26px;
+  height: 24px;
+  min-width: 26px;
+  padding: 0;
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--bit);
+}
+.bit-star {
+  pointer-events: none;
+  line-height: 1;
+  text-shadow: 0 0 5px var(--bit-glow);
+  transition: transform 120ms ease;
+}
+.bit:hover .bit-star { transform: scale(1.12); }
+.bit.fired .bit-star { animation: bit-fire 380ms ease-out; }
+@keyframes bit-fire {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.5) rotate(22deg); text-shadow: 0 0 12px var(--bit-glow); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+/* the ⋯ edit dot, same spot as a tab's close dot */
+.bit-edit {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 15px;
+  height: 15px;
+  border-radius: 999px;
+  background: var(--x-bg);
+  border: 1px solid var(--key-edge);
+  color: var(--ink-soft);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 12px;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 100ms ease;
+}
+.bit:hover .bit-edit { opacity: 1; }
+.bit-edit:hover { color: var(--ink); border-color: var(--sel); }
+
+/* the editor card, floated under the bar */
+.bit-editor {
+  position: absolute;
+  top: 56px;
+  left: 10px;
+  z-index: 6;
+  width: 300px;
+  padding: 12px 14px 14px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, var(--tray-top) 0%, var(--tray-bot) 100%);
+  border: 1px solid var(--tray-edge);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.bit-editor[hidden] { display: none; }
+.bit-editor-title {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.bit-editor input {
+  width: 100%;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 7px;
+  border: 1px solid var(--socket-edge);
+  background: var(--paper-bot);
+  color: var(--ink);
+  font-family: var(--ui-font);
+  font-size: 12.5px;
+  outline: none;
+}
+.bit-editor input.bit-command {
+  font-family: var(--code-font);
+  font-size: 12px;
+}
+.bit-editor input::placeholder { color: var(--ink-soft); opacity: 0.7; }
+.bit-editor input:focus { border-color: var(--sel); box-shadow: 0 0 0 2px var(--sel-soft); }
+.bit-editor input.miss { border-color: #e0655c; box-shadow: 0 0 0 2px rgba(224, 101, 92, 0.25); }
+
+.bit-colors {
+  display: flex;
+  gap: 11px;
+  padding: 4px 4px 2px;
+}
+.bit-swatch {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: var(--ui-font);
+  font-size: 16px;
+  line-height: 1;
+  color: var(--bit);
+  text-shadow: 0 0 5px var(--bit-glow);
+  cursor: pointer;
+  transition: transform 120ms ease;
+}
+.bit-swatch:hover { transform: scale(1.15); }
+.bit-swatch .sel { inset: -4px; --arm: 7px; --thick: 2px; }
+.bit-swatch.on .sel, .bit-swatch:focus-visible .sel { opacity: 1; }
+.bit-swatch:focus-visible { outline: none; }
+
+.bit-editor-keys {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 2px;
+}
+.bit-remove { color: #e0655c; margin-right: auto; }
+.bit-remove:hover { border-color: #c58a84; }
+.bit-remove[hidden] { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bit.fired .bit-star { animation: none; }
+}

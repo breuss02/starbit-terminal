@@ -1,0 +1,414 @@
+/* ---------------------------------------------------------------
+   StarBit chrome — bar, sockets, puffy keys, bracket cursor, status
+   plate and tray. Shared by the terminal view and the Claude view.
+   Load after tokens.css and before the view stylesheet.
+   --------------------------------------------------------------- */
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-family: var(--ui-font);
+  color: var(--ink);
+}
+
+/* ---- quilted wallpaper ---------------------------------------- */
+
+body {
+  background-color: var(--wall);
+  background-image: var(--wall-glow), var(--star-layer, none), var(--wallpaper);
+  display: flex;
+  flex-direction: column;
+  transition: background-color 200ms ease;
+}
+
+/* ---- top bar -------------------------------------------------- */
+
+.bar {
+  container-type: inline-size; /* the rules at the end of this file compact it when narrow */
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 10px;
+  flex: 0 0 auto;
+  background: linear-gradient(180deg, var(--bar-top) 0%, var(--bar-bot) 100%);
+  border-bottom: 1px solid var(--bar-edge);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  transition: background 200ms ease, border-color 200ms ease;
+}
+
+/* the 8-socket row — breathing room so the bracket cursor, badges and
+   close dots are never clipped by the scroll container */
+.tabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 9px 8px 8px;
+  margin-left: -8px;
+  scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+
+/* recessed slot that each terminal tile sits in */
+.socket {
+  position: relative;
+  flex: 0 0 auto;
+  width: 38px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid var(--socket-edge);
+  border-radius: 11px;
+  background: linear-gradient(180deg, var(--socket-deep) 0%, var(--socket) 70%);
+  box-shadow:
+    inset 0 2px 3px rgba(0, 0, 0, 0.12),
+    0 1px 0 rgba(255, 255, 255, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 200ms ease, border-color 200ms ease;
+}
+body[data-theme="dark"] .socket {
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.45),
+    0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+/* an empty socket is itself the "new terminal" button */
+.socket.empty { cursor: pointer; }
+.socket.empty::after {
+  content: "\2726";
+  font-family: var(--ui-font);
+  font-size: 13px;
+  color: var(--starbit);
+  text-shadow: 0 0 4px rgba(245, 200, 76, 0.55);
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity 110ms ease, transform 130ms ease;
+}
+.socket.empty:hover::after { opacity: 0.9; transform: scale(1); }
+.socket.empty:focus-visible {
+  outline: 2px solid var(--sel);
+  outline-offset: 2px;
+}
+.socket.empty:focus-visible::after { opacity: 0.75; }
+
+/* ---- shared puffy "key" tile ---------------------------------- */
+
+.key, .tab {
+  position: relative;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 29px;
+  min-width: 31px;
+  padding: 0 9px;
+  border: 1px solid var(--key-edge);
+  border-radius: 9px;
+  background: linear-gradient(180deg, var(--key-top) 0%, var(--key-mid) 60%, var(--key-bot) 100%);
+  box-shadow:
+    0 2px 0 var(--key-hard),
+    0 3px 5px var(--key-shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  font-family: var(--ui-font);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--key-text);
+  cursor: pointer;
+  transition: transform 90ms ease, box-shadow 90ms ease, filter 120ms ease,
+    background 200ms ease, border-color 200ms ease;
+}
+body[data-theme="dark"] .key,
+body[data-theme="dark"] .tab {
+  box-shadow:
+    0 2px 0 var(--key-hard),
+    0 3px 5px var(--key-shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.key:hover, .tab:hover { filter: brightness(1.04); }
+.key:active, .tab:active {
+  transform: translateY(2px);
+  box-shadow:
+    0 0 0 var(--key-hard),
+    0 1px 2px var(--key-shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+.key:focus-visible, .tab:focus-visible {
+  outline: 2px solid var(--sel);
+  outline-offset: 2px;
+}
+.key:disabled {
+  opacity: 0.4;
+  cursor: default;
+  filter: none;
+}
+.key:disabled:active { transform: none; }
+
+/* candy accents — the only loud things in the room */
+.key svg { display: block; }
+.splitBtn { color: var(--candy-b); }
+
+.themeBtn .ico-sun { display: none; }
+.themeBtn .ico-moon { display: block; }
+body[data-theme="dark"] .themeBtn .ico-sun { display: block; color: #f2c14e; }
+body[data-theme="dark"] .themeBtn .ico-moon { display: none; }
+
+.key-claude {
+  color: #ffffff;
+  padding: 0 13px;
+  border-color: var(--candy-m-hard);
+  background: linear-gradient(180deg, var(--candy-m-top) 0%, var(--candy-m) 55%, var(--candy-m-bot) 100%);
+  box-shadow:
+    0 2px 0 var(--candy-m-hard),
+    0 3px 6px rgba(47, 178, 124, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  text-shadow: 0 1px 1px rgba(20, 90, 60, 0.35);
+  letter-spacing: 0.02em;
+}
+.key-claude:active {
+  box-shadow:
+    0 0 0 var(--candy-m-hard),
+    0 1px 3px rgba(47, 178, 124, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+/* ---- tabs ----------------------------------------------------- */
+
+.tab {
+  width: 30px;
+  height: 26px;
+  min-width: 30px;
+  padding: 0;
+  border-radius: 8px;
+}
+.tab.active { color: var(--ink); }
+
+.tab-label { pointer-events: none; }
+
+.tab-badge {
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  min-width: 14px;
+  height: 14px;
+  padding: 0 3px;
+  border-radius: 999px;
+  background: var(--candy-b);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 14px;
+  text-align: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+}
+
+.tab-x {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 15px;
+  height: 15px;
+  border-radius: 999px;
+  background: var(--x-bg);
+  border: 1px solid var(--key-edge);
+  color: var(--ink-soft);
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 13px;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 100ms ease;
+}
+.tab:hover .tab-x { opacity: 1; }
+.tab-x:hover { color: #e0655c; border-color: #c58a84; }
+
+/* mint / cyan corner-bracket cursor */
+.sel {
+  position: absolute;
+  inset: -6px;
+  pointer-events: none;
+  opacity: 0;
+  --bk: var(--sel);
+  --arm: 11px;
+  --thick: 3px;
+  background:
+    linear-gradient(var(--bk), var(--bk)) left  0 top    0 / var(--arm) var(--thick),
+    linear-gradient(var(--bk), var(--bk)) left  0 top    0 / var(--thick) var(--arm),
+    linear-gradient(var(--bk), var(--bk)) right 0 top    0 / var(--arm) var(--thick),
+    linear-gradient(var(--bk), var(--bk)) right 0 top    0 / var(--thick) var(--arm),
+    linear-gradient(var(--bk), var(--bk)) left  0 bottom 0 / var(--arm) var(--thick),
+    linear-gradient(var(--bk), var(--bk)) left  0 bottom 0 / var(--thick) var(--arm),
+    linear-gradient(var(--bk), var(--bk)) right 0 bottom 0 / var(--arm) var(--thick),
+    linear-gradient(var(--bk), var(--bk)) right 0 bottom 0 / var(--thick) var(--arm);
+  background-repeat: no-repeat;
+  filter: drop-shadow(0 1px 1.5px var(--sel-shadow));
+}
+.tab.active .sel {
+  opacity: 1;
+}
+/* wake: two quick pulses when the cursor lands on a tab, then rest */
+.tab.active.wake .sel {
+  animation: cursor-breathe 0.85s ease-in-out 2;
+}
+@keyframes cursor-breathe {
+  0%, 100% { inset: -6px; }
+  50%      { inset: -4px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tab.active.wake .sel { animation: none; }
+}
+
+/* ---- status text ---------------------------------------------- */
+
+.spacer { flex: 1 1 auto; min-width: 6px; }
+
+.status-plate {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  max-width: 34%;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--socket-edge);
+  background: var(--plate);
+  box-shadow:
+    inset 0 1.5px 2.5px rgba(0, 0, 0, 0.10),
+    0 1px 0 rgba(255, 255, 255, 0.3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  direction: rtl;          /* ellipsis on the left so the folder name stays visible */
+  text-align: left;
+  transition: background 200ms ease, border-color 200ms ease;
+}
+body[data-theme="dark"] .status-plate {
+  box-shadow:
+    inset 0 1.5px 3px rgba(0, 0, 0, 0.4),
+    0 1px 0 rgba(255, 255, 255, 0.04);
+}
+.status-plate:empty { display: none; }
+
+/* terminal deck: the plate is a button that turns into a cd field */
+.cwd-plate { cursor: text; }
+.cwd-plate:hover,
+.cwd-plate:focus-visible {
+  color: var(--ink);
+  border-color: var(--sel);
+  outline: none;
+}
+.status-plate.cwd-input {
+  display: block;              /* beats .status-plate:empty — an <input> is always :empty */
+  direction: ltr;
+  flex: 1 1 260px;
+  max-width: 46%;
+  min-width: 120px;
+  height: auto;
+  margin: 0;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-overflow: clip;
+  border-color: var(--sel);
+  outline: none;
+  caret-color: var(--candy-o);
+}
+.cwd-input[hidden] { display: none; }
+.cwd-input::placeholder { color: var(--ink-soft); opacity: 0.7; font-weight: 500; }
+.cwd-input.busy { opacity: 0.6; }
+.cwd-input.miss {
+  border-color: #e0655c;
+  box-shadow:
+    inset 0 1.5px 2.5px rgba(0, 0, 0, 0.10),
+    0 0 0 3px rgba(224, 101, 92, 0.22);
+  animation: cwd-shake 260ms ease;
+}
+@keyframes cwd-shake {
+  0%, 100% { transform: translateX(0); }
+  25%      { transform: translateX(-3px); }
+  75%      { transform: translateX(3px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cwd-input.miss { animation: none; }
+}
+
+/* ---- tray + panes --------------------------------------------- */
+
+.tray {
+  position: relative;
+  flex: 1 1 auto;
+  margin: 3px 10px 10px;
+  padding: 10px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, var(--tray-top) 0%, var(--tray-bot) 100%);
+  border: 1px solid var(--tray-edge);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.10),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.25),
+    0 1px 0 rgba(255, 255, 255, 0.25);
+  min-height: 0;
+  transition: background 200ms ease, border-color 200ms ease;
+}
+body[data-theme="dark"] .tray {
+  box-shadow:
+    inset 0 2px 5px rgba(0, 0, 0, 0.4),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+}
+
+
+/* ---- decks: terminal / claude share one webview ------------- */
+
+.deck {
+  position: relative; /* anchors floating cards such as the command-bit editor */
+  display: none;
+  flex: 1 1 auto;
+  min-height: 0;
+  flex-direction: column;
+}
+.deck.active { display: flex; }
+
+/* the two-position switch at the left of the bar: >_ and ✦ */
+.deck-switch {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+  margin-right: 12px;
+  padding: 9px 12px 8px 0;
+  border-right: 1px solid var(--bar-edge);
+}
+.switch-key {
+  min-width: 34px;
+  padding: 0 10px;
+  letter-spacing: 0.02em;
+}
+.switch-key .sel { inset: -5px; --arm: 9px; }
+.switch-key.on { color: var(--ink); }
+.switch-key.on .sel { opacity: 1; }
+.switch-key[data-deck="claude"] { color: var(--starbit); }
+
+/* ---- narrow panels ------------------------------------------- */
+/* The sockets already scroll; below these widths the status plate goes
+   (it was being squeezed to nothing anyway) and the keys tighten up so
+   the right-hand keys never fall off the edge of the bar. */
+@container (max-width: 720px) {
+  .status-plate { display: none; }
+  /* …but a cd field that is already open stays, so a resize mid-edit
+     doesn't swallow what you were typing. */
+  .status-plate.cwd-input:not([hidden]) { display: block; min-width: 90px; }
+}
+@container (max-width: 520px) {
+  .bar { gap: 5px; }
+  .bar > .key { min-width: 28px; padding: 0 6px; }
+  .deck-switch { gap: 6px; margin-right: 6px; padding-right: 6px; }
+  .switch-key { min-width: 30px; padding: 0 7px; }
+  .tabs { gap: 5px; }
+}

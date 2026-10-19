@@ -1,0 +1,183 @@
+{
+  "name": "starbit-terminal",
+  "displayName": "StarBitTerminal",
+  "description": "A cozy, Nintendo-inspired terminal panel for VS Code with slot tabs, splits, two themes — plus a Claude Code panel where permission prompts and questions are real gel keys.",
+  "version": "1.1.9",
+  "publisher": "local",
+  "author": "Brandon Reuss",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/breuss02/starbit-terminal.git"
+  },
+  "private": true,
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "main": "./out/extension.js",
+  "activationEvents": [],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": false,
+      "description": "StarBit runs shells and Claude Code with settings (shell, autoCommand, claudePath) that a workspace could override."
+    }
+  },
+  "contributes": {
+    "viewsContainers": {
+      "panel": [
+        {
+          "id": "starbit",
+          "title": "StarBit",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "starbit": [
+        {
+          "type": "webview",
+          "id": "starbit.view",
+          "name": "StarBit",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "starbit.open",
+        "title": "StarBit: Open Terminal Panel"
+      },
+      {
+        "command": "starbit.restart",
+        "title": "StarBit: Restart Focused Terminal"
+      },
+      {
+        "command": "starbit.claude.open",
+        "title": "StarBit: Open Claude Panel"
+      },
+      {
+        "command": "starbit.claude.new",
+        "title": "StarBit: New Claude Session"
+      },
+      {
+        "command": "starbit.claude.stop",
+        "title": "StarBit: Stop Current Claude Turn"
+      },
+      {
+        "command": "starbit.claude.selftest",
+        "title": "StarBit: Check Claude Code Connection"
+      }
+    ],
+    "configuration": {
+      "title": "StarBitTerminal",
+      "properties": {
+        "starbit.shell": {
+          "type": "string",
+          "default": "",
+          "description": "Shell executable to launch. Leave empty to use your default shell ($SHELL on macOS/Linux, PowerShell on Windows)."
+        },
+        "starbit.autoCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Command typed into every new terminal automatically, e.g. 'claude'. Leave empty for a plain shell."
+        },
+        "starbit.commandBits": {
+          "type": "array",
+          "default": [],
+          "maxItems": 6,
+          "description": "Command bits on the terminal bar: coloured ✦ keys that type a command into the focused terminal. Add and edit them from the bar (the + socket, or right-click a bit), or here.",
+          "items": {
+            "type": "object",
+            "required": ["command"],
+            "properties": {
+              "label": { "type": "string", "description": "Shown on hover. Falls back to the command." },
+              "command": { "type": "string", "description": "Typed into the terminal, followed by Enter." },
+              "color": {
+                "type": "string",
+                "enum": ["gold", "mint", "blue", "orange", "red", "purple", "cyan", "pink"],
+                "default": "gold"
+              }
+            }
+          }
+        },
+        "starbit.fontFamily": {
+          "type": "string",
+          "default": "\"M PLUS 1 Code\", \"SF Mono\", \"Cascadia Code\", \"JetBrains Mono\", Menlo, Consolas, \"DejaVu Sans Mono\", monospace",
+          "description": "Font family for the terminal. Defaults to the bundled M PLUS 1 Code (rounded, Nintendo-flavored)."
+        },
+        "starbit.fontSize": {
+          "type": "number",
+          "default": 13.5,
+          "description": "Font size for the terminal."
+        },
+        "starbit.theme": {
+          "type": "string",
+          "enum": [
+            "light",
+            "dark"
+          ],
+          "default": "light",
+          "description": "Color theme: 'light' (Basic White, 3DS-style) or 'dark' (Basic Black, Switch-style). The sun/moon key in either panel toggles and saves this."
+        },
+        "starbit.claudePath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to the Claude Code binary used by the Claude panel. Leave empty to use the `claude` found by your login shell (or ~/.local/bin/claude)."
+        },
+        "starbit.claude.defaultMode": {
+          "type": "string",
+          "enum": [
+            "default",
+            "acceptEdits",
+            "plan"
+          ],
+          "enumDescriptions": [
+            "Ask before every tool that needs permission",
+            "Auto-accept file edits, ask for the rest",
+            "Plan first; no tools run until you approve"
+          ],
+          "default": "default",
+          "description": "Permission mode new Claude sessions start in. The mode key in the panel changes it per session."
+        },
+        "starbit.claude.model": {
+          "type": "string",
+          "default": "",
+          "description": "Model for new Claude sessions (e.g. 'opus', 'sonnet'). Empty = Claude Code's default."
+        },
+        "starbit.claude.debug": {
+          "type": "boolean",
+          "default": false,
+          "description": "Forward the Claude Code process's stderr into the panel's webview console (Help → Toggle Developer Tools)."
+        },
+        "starbit.claude.sidePanels": {
+          "type": "boolean",
+          "default": true,
+          "description": "Use the space beside the Claude transcript for side rails: a terminal on the right (in the workspace folder, whenever the panel has room for it) and, when the panel is wide (e.g. maximized), a session-stats rail on the left."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "rebuild": "electron-rebuild -f -w node-pty",
+    "package": "vsce package",
+    "vscode:prepublish": "npm run compile"
+  },
+  "dependencies": {
+    "@anthropic-ai/claude-agent-sdk": "0.3.257",
+    "@xterm/addon-fit": "^0.10.0",
+    "@xterm/addon-web-links": "^0.11.0",
+    "@xterm/xterm": "^5.5.0",
+    "node-pty": "^1.0.0"
+  },
+  "devDependencies": {
+    "@electron/rebuild": "^3.6.0",
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.90.0",
+    "typescript": "^5.4.0"
+  }
+}
