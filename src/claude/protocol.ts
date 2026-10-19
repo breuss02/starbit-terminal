@@ -28,7 +28,7 @@ export type InboundMsg =
   | { type: 'setTheme'; theme: Theme }
   | { type: 'openFile'; path: string }
   | { type: 'dropFile'; id: string; name: string; data: string }
-  | { type: 'rails'; stats: boolean; term: boolean; termPx: number };
+  | { type: 'rails'; stats: boolean; termPx: number };
 
 /* ---- extension → webview ------------------------------------------- */
 
@@ -44,10 +44,10 @@ export interface AskPayload {
   suggestions: PermissionUpdate[];
 }
 
-/** The side rails: which are collapsed to a strip, and the width the terminal was dragged to (0 = default). */
+/** The side rails: whether stats is collapsed to a strip, and the width the terminal was dragged to (0 = default).
+    (The terminal's own fold is not saved: it always starts folded.) */
 export interface RailsState {
   stats: boolean;
-  term: boolean;
   termPx: number;
 }
 

@@ -132,18 +132,18 @@ keys instead of TUI menus:
 - **Side rails** beside the transcript, as their own cards that stay put
   while the transcript streams or scrolls. Each one has a small chevron key
   at its top-right that folds it into a slim strip (click the strip to bring
-  it back); the two fold independently and the choice is remembered.
+  it back); the two fold independently.
   - *Terminal* (right, whenever the tray has room for it beside a readable
     transcript — about 830px+): a real shell in the workspace folder, the
     same folder Claude works in, so you can watch the chat and run commands
-    on one screen. It starts the first time the rail is shown and keeps
-    running while it is folded, the panel narrows or the `>_` deck is in
-    front. Drag its left edge to resize it (double-click the edge to reset);
+    on one screen. It always opens folded to a strip; click the strip and
+    the shell starts, then keeps running while it is folded again, the panel
+    narrows or the `>_` deck is in front. Drag its left edge to resize it (double-click the edge to reset);
     ↻ in its header restarts the shell. Links, file paths and file drops
     work as in the terminal deck.
   - *Session stats* (left, when the panel is wide — e.g. maximized,
     1180px+ of tray — and there is room left beside the terminal; for the
-    socket in front): total tokens, a cache read / cache write / input /
+    socket in front; its fold is remembered): total tokens, a cache read / cache write / input /
     output breakdown, the context meter, turns, API calls, tool uses and
     time working, a tokens-per-turn column chart (hover a column for its
     numbers), the top tools, and a per-model split when more than one model

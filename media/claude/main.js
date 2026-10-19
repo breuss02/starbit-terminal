@@ -1826,10 +1826,12 @@
 
   const STRIP = 34; // a collapsed rail: a slim strip at the tray's edge
 
-  // Each rail can be collapsed on its own (saved in globalState): the key at
-  // its top-right folds it into a strip; clicking the strip unfolds it. The
-  // terminal's width is dragged at its left edge (double-click resets it).
-  const collapsed = { stats: false, term: false };
+  // Each rail can be collapsed on its own: the key at its top-right folds it
+  // into a strip; clicking the strip unfolds it. The stats fold is saved in
+  // globalState; the terminal always starts folded (its shell only starts
+  // when it is first unfolded). The terminal's width is dragged at its left
+  // edge (double-click resets it) and is saved.
+  const collapsed = { stats: false, term: true };
   let termWant = 0; // the width the user dragged the terminal to (0 = TERM_SHARE)
   let railPx = RAIL_MIN;
   let termPx = TERM_MIN;
@@ -1875,7 +1877,7 @@
   }
 
   function saveRails() {
-    vscode.postMessage({ type: 'rails', stats: collapsed.stats, term: collapsed.term, termPx: termWant });
+    vscode.postMessage({ type: 'rails', stats: collapsed.stats, termPx: termWant });
   }
 
   function applyRails() {
@@ -2006,7 +2008,6 @@
         sidePanels = msg.sidePanels !== false;
         if (msg.rails) {
           collapsed.stats = msg.rails.stats === true;
-          collapsed.term = msg.rails.term === true;
           termWant = Number(msg.rails.termPx) > 0 ? Math.round(msg.rails.termPx) : 0;
         }
         railsBooted = true;

@@ -92,7 +92,7 @@ export class ClaudeDeck {
   private rails(): RailsState {
     const r = this.context.globalState.get<Partial<RailsState>>(RAILS_KEY, {});
     const px = Number(r.termPx);
-    return { stats: r.stats === true, term: r.term === true, termPx: px > 0 ? Math.round(px) : 0 };
+    return { stats: r.stats === true, termPx: px > 0 ? Math.round(px) : 0 };
   }
 
   private resumable(): ResumableSession[] {
@@ -262,7 +262,6 @@ export class ClaudeDeck {
         const px = Number(msg.termPx);
         void this.context.globalState.update(RAILS_KEY, {
           stats: msg.stats === true,
-          term: msg.term === true,
           termPx: Number.isFinite(px) && px > 0 ? Math.round(px) : 0
         });
         break;

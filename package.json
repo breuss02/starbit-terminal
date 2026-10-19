@@ -2,7 +2,7 @@
   "name": "starbit-terminal",
   "displayName": "StarBitTerminal",
   "description": "A cozy, Nintendo-inspired terminal panel for VS Code with slot tabs, splits, two themes — plus a Claude Code panel where permission prompts and questions are real gel keys.",
-  "version": "1.1.9",
+  "version": "1.1.10",
   "publisher": "local",
   "author": "Brandon Reuss",
   "license": "MIT",
